@@ -53,14 +53,12 @@ Acceder a la aplicación
 Abre tu navegador en: http://localhost:5000
 
 ## Credenciales de prueba
-- Manager:
 
--- Email: manager@company.com
+- **Manager:**
+  - Email: `manager@company.com`
+  - Contraseña: `securepass123`
 
--- Contraseña: securepass123
+- **Desarrollador:**
+  - Email: `dev1@company.com`
+  - Contraseña: `developerpass`
 
-- Desarrollador:
-
--- Email: dev1@company.com
-
--- Contraseña: developerpass
