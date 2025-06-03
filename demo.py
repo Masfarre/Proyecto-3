@@ -1,6 +1,7 @@
-import streamlit as st
+import gradio as gr
 import datetime
 import random
+import pandas as pd
 
 # Clase SimpleNLP (alternativa a spaCy)
 class SimpleNLP:
@@ -38,159 +39,189 @@ class SimpleNLP:
 
 nlp = SimpleNLP()
 
-# Clase Task
-class Task:
-    def __init__(self, title, description, deadline):
-        self.id = random.randint(1000, 9999)
-        self.title = title
-        self.description = description
-        self.deadline = deadline
-        self.created_at = datetime.datetime.now()
-        self.status = "open"
-        self.priority = None
-        self.category = None
-        self.auto_assign_priority()
-        self.categorize_task()
-        
-    def auto_assign_priority(self):
-        content = (self.title + " " + self.description).lower()
-        analysis = nlp.analyze_text(content)
-        self.priority = analysis["priority"]
-    
-    def categorize_task(self):
-        content = (self.title + " " + self.description).lower()
-        analysis = nlp.analyze_text(content)
-        self.category = analysis["category"]
+# Base de datos en memoria para la demo
+tasks = []
+task_id_counter = 1
 
-# Datos de ejemplo
-sample_users = {
-    "manager@company.com": {"name": "John Manager", "role": "manager"},
-    "dev@company.com": {"name": "Alice Developer", "role": "developer"},
-    "marketing@company.com": {"name": "Carol Marketer", "role": "marketing"}
-}
-
-sample_tasks = [
-    Task("Fix login bug", "Critical bug preventing users from logging in", "2023-12-15"),
-    Task("Create holiday campaign", "Design Christmas marketing campaign", "2023-11-30"),
-    Task("Update API documentation", "Document new endpoints for v2 API", "2023-12-10")
-]
-
-# Configuración de Streamlit
-st.set_page_config(
-    page_title="TaskFlow Demo",
-    page_icon="✅",
-    layout="wide"
-)
-
-# Diseño de la aplicación
-def main():
-    st.title("TaskFlow - Sistema de Gestión de Tareas Inteligente")
-    st.caption("Demo online del sistema de gestión de tareas con priorización automática")
+# Crear algunas tareas de ejemplo
+def create_sample_tasks():
+    global tasks, task_id_counter
+    sample_tasks = [
+        ("Fix login bug", "Critical bug preventing users from logging in", "2023-12-15"),
+        ("Create holiday campaign", "Design Christmas marketing campaign", "2023-11-30"),
+        ("Update API documentation", "Document new endpoints for v2 API", "2023-12-10")
+    ]
     
-    # Sección de autenticación
-    with st.sidebar:
-        st.header("Inicio de Sesión")
-        email = st.text_input("Email", value="manager@company.com")
-        password = st.text_input("Contraseña", type="password", value="securepass123")
-        
-        if st.button("Ingresar"):
-            if email in sample_users:
-                st.session_state.user = email
-                st.success(f"Bienvenido, {sample_users[email]['name']}!")
-            else:
-                st.error("Credenciales inválidas")
-    
-    # Si el usuario está autenticado
-    if 'user' in st.session_state:
-        user = st.session_state.user
-        user_data = sample_users[user]
-        
-        # Dashboard principal
-        st.subheader(f"Panel de Control - {user_data['name']}")
-        
-        # Métricas
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Tareas Totales", len(sample_tasks))
-        col2.metric("Tareas Abiertas", sum(1 for t in sample_tasks if t.status == "open"))
-        col3.metric("Tareas Completadas", sum(1 for t in sample_tasks if t.status == "completed"))
-        
-        # Crear nueva tarea
-        with st.expander("➕ Crear Nueva Tarea"):
-            with st.form("new_task_form"):
-                title = st.text_input("Título de la tarea")
-                description = st.text_area("Descripción")
-                deadline = st.date_input("Fecha límite")
-                
-                if st.form_submit_button("Crear Tarea"):
-                    if title and description:
-                        new_task = Task(title, description, deadline.strftime("%Y-%m-%d"))
-                        sample_tasks.append(new_task)
-                        st.success("Tarea creada exitosamente!")
-                    else:
-                        st.error("Título y descripción son requeridos")
-        
-        # Lista de tareas
-        st.subheader("Tus Tareas")
-        
-        for task in sample_tasks:
-            with st.container():
-                priority_color = {
-                    "high": "#ff4b4b",
-                    "medium": "#ffa700",
-                    "low": "#0f9d58"
-                }.get(task.priority, "#9e9e9e")
-                
-                col1, col2 = st.columns([0.8, 0.2])
-                with col1:
-                    st.markdown(f"**{task.title}**")
-                    st.caption(f"🔖 Categoría: {task.category.capitalize()}")
-                    st.caption(f"📅 Fecha límite: {task.deadline}")
-                    st.write(task.description)
-                
-                with col2:
-                    st.markdown(
-                        f'<span style="color:{priority_color}; font-weight:bold">'
-                        f'⬤ {task.priority.capitalize()}</span>', 
-                        unsafe_allow_html=True
-                    )
-                    status = st.selectbox(
-                        "Estado",
-                        ["open", "in_progress", "completed"],
-                        index=["open", "in_progress", "completed"].index(task.status),
-                        key=f"status_{task.id}",
-                        label_visibility="collapsed"
-                    )
-                    task.status = status
-                
-                st.divider()
-    
-    # Información para usuarios no autenticados
-    else:
-        st.info("Por favor inicia sesión para acceder al sistema")
-        st.image("https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&q=80", 
-                caption="Sistema de gestión de tareas inteligente")
-        
-        st.subheader("Características Principales")
-        col1, col2, col3 = st.columns(3)
-        col1.markdown("""
-        **📊 Priorización Automática**  
-        Clasifica tareas por urgencia usando NLP
-        """)
-        col2.markdown("""
-        **👥 Asignación Inteligente**  
-        Distribuye tareas según habilidades del equipo
-        """)
-        col3.markdown("""
-        **📈 Dashboard Interactivo**  
-        Visualiza el progreso en tiempo real
-        """)
-        
-        st.subheader("Credenciales de Prueba")
-        st.table({
-            "Rol": ["Gerente", "Desarrollador", "Marketing"],
-            "Email": ["manager@company.com", "dev@company.com", "marketing@company.com"],
-            "Contraseña": ["securepass123", "developerpass", "marketingpass"]
+    for title, desc, deadline in sample_tasks:
+        tasks.append({
+            "id": task_id_counter,
+            "title": title,
+            "description": desc,
+            "deadline": deadline,
+            "created_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "priority": "",
+            "category": "",
+            "status": "open"
         })
+        task_id_counter += 1
+        analyze_task(task_id_counter - 1)
+
+# Analizar una tarea para asignar prioridad y categoría
+def analyze_task(task_id):
+    global tasks
+    task = next((t for t in tasks if t["id"] == task_id), None)
+    if task:
+        content = task["title"] + " " + task["description"]
+        analysis = nlp.analyze_text(content)
+        task["priority"] = analysis["priority"]
+        task["category"] = analysis["category"]
+    return task
+
+# Crear una nueva tarea
+def create_task(title, description, deadline):
+    global tasks, task_id_counter
+    if not title or not description:
+        return "Error: Título y descripción son requeridos", None
+    
+    new_task = {
+        "id": task_id_counter,
+        "title": title,
+        "description": description,
+        "deadline": deadline,
+        "created_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "priority": "",
+        "category": "",
+        "status": "open"
+    }
+    
+    tasks.append(new_task)
+    task_id_counter += 1
+    
+    # Analizar la nueva tarea
+    analyze_task(new_task["id"])
+    
+    return "✅ Tarea creada exitosamente!", get_task_table()
+
+# Obtener tabla de tareas para mostrar
+def get_task_table():
+    if not tasks:
+        return pd.DataFrame(columns=["ID", "Título", "Prioridad", "Categoría", "Fecha Límite", "Estado"])
+    
+    data = []
+    for task in tasks:
+        data.append([
+            task["id"],
+            task["title"],
+            task["priority"].capitalize() if task["priority"] else "Pendiente",
+            task["category"].capitalize() if task["category"] else "Pendiente",
+            task["deadline"],
+            task["status"].replace("_", " ").capitalize()
+        ])
+    
+    return pd.DataFrame(data, columns=["ID", "Título", "Prioridad", "Categoría", "Fecha Límite", "Estado"])
+
+# Actualizar estado de una tarea
+def update_task_status(task_id, new_status):
+    global tasks
+    task = next((t for t in tasks if t["id"] == task_id), None)
+    if task:
+        task["status"] = new_status
+        return "✅ Estado actualizado", get_task_table()
+    return "❌ Tarea no encontrada", get_task_table()
+
+# Interfaz de Gradio
+with gr.Blocks(title="TaskFlow Demo", theme="soft") as demo:
+    gr.Markdown("# 🚀 TaskFlow - Sistema de Gestión de Tareas")
+    gr.Markdown("**Priorización automática de tareas usando procesamiento de lenguaje natural**")
+    
+    # Crear tareas de ejemplo al inicio
+    create_sample_tasks()
+    
+    with gr.Row():
+        with gr.Column(scale=1):
+            gr.Markdown("## 📝 Crear Nueva Tarea")
+            title = gr.Textbox(label="Título", placeholder="Título de la tarea")
+            description = gr.Textbox(label="Descripción", placeholder="Describe la tarea...", lines=3)
+            deadline = gr.Textbox(label="Fecha Límite (YYYY-MM-DD)", value=datetime.date.today().strftime("%Y-%m-%d"))
+            submit_btn = gr.Button("Crear Tarea", variant="primary")
+            result_msg = gr.Label()
+        
+        with gr.Column(scale=2):
+            gr.Markdown("## 📋 Lista de Tareas")
+            task_table = gr.Dataframe(
+                value=get_task_table(),
+                headers=["ID", "Título", "Prioridad", "Categoría", "Fecha Límite", "Estado"],
+                datatype=["number", "str", "str", "str", "str", "str"],
+                interactive=False
+            )
+            
+            with gr.Row():
+                task_id = gr.Number(label="ID de Tarea", precision=0)
+                status_dropdown = gr.Dropdown(
+                    ["open", "in_progress", "completed"],
+                    label="Nuevo Estado",
+                    value="open"
+                )
+                update_btn = gr.Button("Actualizar Estado")
+                update_result = gr.Label()
+            
+            refresh_btn = gr.Button("Actualizar Lista")
+    
+    # Event handlers
+    submit_btn.click(
+        create_task, 
+        inputs=[title, description, deadline],
+        outputs=[result_msg, task_table]
+    )
+    
+    update_btn.click(
+        update_task_status,
+        inputs=[task_id, status_dropdown],
+        outputs=[update_result, task_table]
+    )
+    
+    refresh_btn.click(
+        lambda: get_task_table(),
+        outputs=task_table
+    )
+    
+    # Ejemplos de uso
+    gr.Markdown("## 💡 Ejemplos de Tareas")
+    gr.Examples(
+        examples=[
+            ["Resolver error crítico en producción", "Hay un error que impide el acceso a los usuarios. ¡Urgente!", "2023-11-20"],
+            ["Planificar reunión de equipo", "Organizar reunión para revisar progreso del trimestre", "2023-11-25"],
+            ["Mejorar diseño de la interfaz", "Rediseñar la página principal para mejor experiencia de usuario", "2023-12-05"]
+        ],
+        inputs=[title, description, deadline],
+        outputs=[result_msg, task_table],
+        fn=create_task,
+        cache_examples=True
+    )
+    
+    # Explicación del sistema
+    with gr.Accordion("ℹ️ Sobre TaskFlow", open=False):
+        gr.Markdown("""
+        **TaskFlow** es un sistema inteligente de gestión de tareas que utiliza procesamiento de lenguaje natural para:
+        - Clasificar automáticamente tareas por prioridad (alta, media, baja)
+        - Asignar categorías según el contenido de la tarea
+        - Optimizar el flujo de trabajo en equipos
+        
+        ### Cómo funciona
+        1. **Ingresa una tarea** con título y descripción
+        2. El sistema **analiza el texto** para determinar prioridad y categoría
+        3. **Visualiza y gestiona** tus tareas en el panel
+        
+        ### Prioridades
+        - 🔴 **Alta**: Contiene palabras como 'urgente', 'crítico', 'importante'
+        - 🟠 **Media**: Contiene palabras como 'medio', 'moderado', 'pronto'
+        - 🟢 **Baja**: Sin palabras clave de prioridad
+        
+        ### Categorías comunes
+        - 💻 Desarrollo: 'bug', 'feature', 'código', 'api'
+        - 📣 Marketing: 'campaña', 'seo', 'contenido'
+        - 🎨 Diseño: 'diseño', 'ui', 'ux', 'mockup'
+        """)
 
 if __name__ == "__main__":
-    main()
+    demo.launch()
