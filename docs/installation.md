@@ -52,15 +52,15 @@ python app.py
 Acceder a la aplicación
 Abre tu navegador en: http://localhost:5000
 
-##Credenciales de prueba
--Manager:
+## Credenciales de prueba
+- Manager:
 
---Email: manager@company.com
+-- Email: manager@company.com
 
---Contraseña: securepass123
+-- Contraseña: securepass123
 
--Desarrollador:
+- Desarrollador:
 
---Email: dev1@company.com
+-- Email: dev1@company.com
 
---Contraseña: developerpass
+-- Contraseña: developerpass
