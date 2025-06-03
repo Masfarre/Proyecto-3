@@ -25,16 +25,7 @@ TaskFlow automatiza estos procesos usando inteligencia artificial para:
 - PostgreSQL 12+
 - Redis (para colas de tareas)
 
----
-title: TaskFlow Demo
-emoji: ✅
-colorFrom: blue
-colorTo: purple
-sdk: streamlit
-sdk_version: 1.25.0
-app_file: demo.py
-pinned: false
----
+
 
 # TaskFlow - Sistema de Gestión de Tareas
 
