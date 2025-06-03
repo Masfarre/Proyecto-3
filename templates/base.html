@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>TaskFlow</h1>
+        <nav>
+            {% if user %}
+                <span>Welcome, {{ users[user]['name'] }}!</span>
+                <a href="{{ url_for('dashboard', user=user) }}">Dashboard</a>
+                <a href="{{ url_for('create_task', user=user) }}">Create Task</a>
+                <a href="{{ url_for('home') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+        </nav>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer>
+        <p>TaskFlow v1.0 | Open Source Task Management</p>
+    </footer>
+</body>
+</html>
