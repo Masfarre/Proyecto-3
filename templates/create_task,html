@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Create Task{% endblock %}
+
+{% block content %}
+<h2>Create New Task</h2>
+
+<form method="POST" action="{{ url_for('create_task') }}">
+    <input type="hidden" name="user" value="{{ user }}">
+    
+    <div class="form-group">
+        <label for="title">Task Title</label>
+        <input type="text" id="title" name="title" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" required></textarea>
+    </div>
+    
+    <div class="form-group">
+        <label for="deadline">Deadline</label>
+        <input type="date" id="deadline" name="deadline" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="auto_assign">Auto Assign</label>
+        <input type="checkbox" id="auto_assign" name="auto_assign" checked>
+        <small>Automatically assign to best-suited team member</small>
+    </div>
+    
+    <button type="submit" class="btn">Create Task</button>
+</form>
+{% endblock %}
