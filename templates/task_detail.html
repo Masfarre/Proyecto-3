@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Task {{ task.id }}{% endblock %}
+
+{% block content %}
+<div class="task-detail">
+    <h2>{{ task.title }}</h2>
+    <p class="meta">Created by: {{ users[task.creator]['name'] }} on {{ task.created_at }}</p>
+    
+    <div class="task-info">
+        <div>
+            <strong>Priority:</strong> 
+            <span class="priority-{{ task.priority }}">{{ task.priority|capitalize }}</span>
+        </div>
+        <div>
+            <strong>Category:</strong> {{ task.category|capitalize }}
+        </div>
+        <div>
+            <strong>Deadline:</strong> {{ task.deadline }}
+        </div>
+        <div>
+            <strong>Status:</strong> {{ task.status|replace('_', ' ')|capitalize }}
+        </div>
+        <div>
+            <strong>Assigned to:</strong> 
+            {% if task.assigned_to %}
+                {{ users[task.assigned_to]['name'] }}
+            {% else %}
+                Not assigned
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="description">
+        <h3>Description</h3>
+        <p>{{ task.description }}</p>
+    </div>
+    
+    <form method="POST" action="{{ url_for('update_status', task_id=task.id) }}">
+        <input type="hidden" name="user" value="{{ user }}">
+        <div class="form-group">
+            <label for="status">Update Status</label>
+            <select id="status" name="status">
+                <option value="open" {% if task.status=='open' %}selected{% endif %}>Open</option>
+                <option value="in_progress" {% if task.status=='in_progress' %}selected{% endif %}>In Progress</option>
+                <option value="completed" {% if task.status=='completed' %}selected{% endif %}>Completed</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Update</button>
+    </form>
+</div>
+{% endblock %}
