@@ -25,3 +25,14 @@ TaskFlow automatiza estos procesos usando inteligencia artificial para:
 - PostgreSQL 12+
 - Redis (para colas de tareas)
 
+## Demo Online
+
+Puedes probar una versión funcional de TaskFlow directamente en tu navegador:
+
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/masfaa/Proyecto-3)
+
+La demo incluye:
+- Sistema completo de gestión de tareas
+- Priorización automática con NLP
+- Interfaz intuitiva para crear y actualizar tareas
+- Ejemplos preconfigurados
