@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h2>Intelligent Task Management</h2>
+    <p>Automate task prioritization and assignment with AI-powered workflow optimization</p>
+    <a href="{{ url_for('login') }}" class="btn">Get Started</a>
+</div>
+
+<div class="features">
+    <div class="feature">
+        <h3>AI-Prioritization</h3>
+        <p>Automatically classify tasks by urgency and impact using NLP</p>
+    </div>
+    <div class="feature">
+        <h3>Smart Assignment</h3>
+        <p>Assign tasks based on skills, workload, and deadlines</p>
+    </div>
+    <div class="feature">
+        <h3>Workflow Analytics</h3>
+        <p>Track team performance and identify bottlenecks</p>
+    </div>
+</div>
+{% endblock %}
